@@ -5,7 +5,7 @@ language: English
 pov: Third person, past tense
 tense: Past
 ---
-This is the sample project that ships with Writer. It exists to show how the pieces fit together; replace it with your own book or delete it.
+This is the sample project that ships with Noveleditor. It exists to show how the pieces fit together; replace it with your own book or delete it.
 
 Everything the AI editor is told comes from files in this folder:
 

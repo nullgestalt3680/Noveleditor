@@ -1,4 +1,4 @@
-/* Writer front end. Vanilla JS, talks to server.py. Strings live in i18n.js. */
+/* Noveleditor front end. Vanilla JS, talks to server.py. Strings live in i18n.js. */
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => Array.from(document.querySelectorAll(s));
 

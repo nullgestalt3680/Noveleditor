@@ -403,7 +403,7 @@ def stream_openai_compatible(cfg, mspec, system, messages, max_tokens):
     if key:
         req.add_header("Authorization", f"Bearer {key}")
     req.add_header("HTTP-Referer", "http://localhost")
-    req.add_header("X-Title", "Novel Editor")
+    req.add_header("X-Title", "Noveleditor")
     try:
         resp = urllib.request.urlopen(req, timeout=600)
     except urllib.error.HTTPError as e:
@@ -1378,7 +1378,7 @@ def main():
     PROJECTS.mkdir(exist_ok=True)
     srv = ThreadingHTTPServer(("127.0.0.1", PORT), Handler)
     srv.daemon_threads = True
-    print(f"Novel editor running at http://localhost:{PORT}  (projects in {PROJECTS})")
+    print(f"Noveleditor running at http://localhost:{PORT}  (projects in {PROJECTS})")
     try:
         srv.serve_forever()
     except KeyboardInterrupt:

@@ -1,36 +1,73 @@
-# Writer
+# Noveleditor
 
-A local editor for writing long fiction with an AI *editor*, not an AI writer.
+A local, file-based editor for long fiction, with an AI editor that remembers your book.
 
-You write the prose. The editor reads your scenes together with your story bible and the decisions you have already made, and gives you critique, line edits, voice checks, summaries, rewrites of selected passages, and in-world inserts. It remembers what you decided last month because those decisions live in a file it reads every time, not in a chat window that forgets.
+Noveleditor is for writers who draft in their own voice and want a second reader who knows the whole manuscript: the characters, the places, the style rules, and every decision made along the way. It does not generate chapters for you. It critiques, line-edits, checks voices against your story bible, summarizes, rewrites a selected passage on request, and drafts in-world documents in the formats you define. Because the decisions it is told to respect live in a file it reads before every reply, it does not forget them when the conversation gets long.
 
-Everything is plain files on your disk. There is no account, no sync, no subscription. You bring your own API key.
+Everything is plain files on your own disk: Markdown scenes, Markdown codex entries, a Markdown memory file, JSON chats. No account, no cloud, no subscription. You bring an API key for the model you want to use.
 
-## Why
+## Features
 
-Tools like NovelCrafter and Sudowrite are built around generating prose from beats. Writer is built around the other half of the job: a writer who drafts in their own voice and wants an editor with a complete memory of the book. The three ideas that make that work:
+- **Scenes and chapters** as Markdown files with a small front matter block (title, status, summary, codex tags). Drag to reorder in the sidebar; files are renamed to match.
+- **Codex** (story bible): characters, locations, lore. Entries are pulled into the model's context when their name or an alias appears in the scene; entries marked *always* (style guides, format rules) go in every time.
+- **Editor memory**: one click extracts the decisions from a conversation into `editor-memory.md`. Every later reply starts from that file. A *Tidy* action consolidates the file when it grows.
+- **Operations on a scene**: critique, line edit, voice check, summarize, rewrite selection, insert an in-world document at the cursor, render a draft in screenplay format. Results apply back into the text with one click.
+- **Materials pane**: preview your research, notes and earlier drafts (.docx, .md, .txt, .html, .pdf, images, audio) beside the text. Never sent to the model.
+- **History and snapshots**: automatic versions of each scene before any AI change, and one-click zip snapshots of the whole project.
+- **Checks without a model**: a scripted checker for in-world logs (timestamps, formats, stray tags) and a keyword index across the book.
+- **Export** to Markdown or Word (.docx).
+- **Models**: any Claude model through the Anthropic API, plus any OpenAI-compatible endpoint (OpenRouter, a local server) as an extra provider. Each chat remembers its model.
+- **Prompts are files.** Every operation is a Markdown template you can read and override, per project or globally.
+- Interface in English or Chinese. Resizable panes. Whole-book word count.
 
-1. **Codex entries are injected by name.** Character, place and lore entries are pulled into the prompt when their name or an alias appears in the scene. Style guides and format rules are marked *always* and go in every time.
-2. **Editor memory.** After a conversation settles something, one click extracts the decisions into `editor-memory.md`. Every later reply starts from that file.
-3. **Nothing is hidden.** Prompts are Markdown files you can read and change. Scenes are Markdown files with a small front matter block. Chats are JSON. Put the folder in git if you like.
+## System requirements
 
-## Requirements
-
+- Windows 10/11, macOS 12+, or Linux
 - Python 3.10 or newer
-- `pip install anthropic`
-- An Anthropic API key, and optionally a key for any OpenAI-compatible provider (OpenRouter, a local model server)
+- A modern browser (Chrome, Edge, Firefox, Safari)
+- Internet access for model calls; the app itself runs offline
+- An Anthropic API key (https://console.anthropic.com), and optionally an OpenRouter key or a local model server
 
-No Node, no build step, no database.
+No Node, no build step, no database, no admin rights.
 
-## Run
+## Installation
+
+**1. Get the code.** Either clone it:
+
+```bash
+git clone https://github.com/nullgestalt3680/Noveleditor.git
+cd Noveleditor
+```
+
+or download the ZIP from the GitHub page and unzip it anywhere.
+
+**2. Install Python** if you do not have it: https://www.python.org/downloads/ (on Windows tick "Add python.exe to PATH" in the installer). Check with:
+
+```bash
+python --version
+```
+
+**3. Install the one dependency:**
+
+```bash
+pip install anthropic
+```
+
+**4. Start the server.** On Windows double-click `run.bat`, or from a terminal:
 
 ```bash
 python app/server.py
 ```
 
-Open http://localhost:8765. Click **Settings**, paste your API key, save. The sample project *The Lighthouse Ledger* is loaded; its scenes explain the interface as you read them.
+On macOS/Linux you can also use `./run.sh`. The server prints `Noveleditor running at http://localhost:8765`.
 
-Set `NOVEL_PORT` to use a different port. Interface language is English or Chinese, chosen in Settings.
+**5. Open http://localhost:8765** in your browser. Click **Settings** (top right), paste your API key, save.
+
+The sample project *The Lighthouse Ledger* opens first; its scenes explain the interface as you read them. Create your own project with the **＋** button next to the project name.
+
+To use a different port, set `NOVEL_PORT` before starting, for example `NOVEL_PORT=9000 python app/server.py`.
+
+**Updating:** replace the `app/` folder with the new one. Your projects, keys, prompt overrides and snapshots all live outside `app/`.
 
 ## Layout of a project
 
@@ -38,6 +75,7 @@ Set `NOVEL_PORT` to use a different port. Interface language is English or Chine
 projects/<your-book>/
   project.md            global notes (front matter: title, author, language, pov)
   editor-memory.md      decisions the editor reads before every reply
+  prompts/              optional per-project prompt overrides
   scenes/01-Chapter/    one folder per chapter, chapter.md holds the title
       01-Scene.md       front matter: title, status, summary, codex; prose below
   codex/characters/     one Markdown file per entry: name, aliases, always, type
@@ -75,17 +113,7 @@ followed by the last 40 messages of the conversation. Anthropic prompt caching i
 | Screenplay | Renders a draft in the project's screenplay format | one click replaces the selection |
 | Save to editor notes | Extracts decisions from the recent exchange into `editor-memory.md` | |
 
-All of these are templates in `app/prompts/ops/`. **Prompts** in the top bar edits them; a changed template is saved as an override for the project or for all projects, the bundled defaults are never touched. Resolution order: `projects/<book>/prompts/` → `prompts/` (next to `app/`) → `app/prompts/`.
-
-## Other features
-
-- **Materials pane**: preview .docx, .md, .txt, .html, .pdf, images and audio from the project's `materials/` folder beside the text. Never sent to the model.
-- **History**: a version of the scene is saved before every AI replace or insert, and at most once every 20 minutes while you type. Preview and restore from the scene header.
-- **Snapshots**: zip the whole project into `snapshots/` with one click.
-- **Check**: a scripted checker for in-world logs (timestamps that go backwards, format slips, tags that appear only once) and a keyword index across the book. No model calls.
-- **Export**: Markdown or .docx, whole book or chosen chapters.
-- **Resizable panes**, drag-and-drop ordering, whole-book word count.
-- **Models**: any number of Claude models, and any OpenAI-compatible endpoint as a provider. Each chat remembers its model.
+All of these are templates in `app/prompts/ops/`. **Prompts** in the top bar shows the one in effect and lets you save a changed copy for this project or for all projects; the bundled defaults are never modified. Resolution order: `projects/<book>/prompts/` → `prompts/` (next to `app/`) → `app/prompts/`.
 
 ## Importing an existing book
 
@@ -115,8 +143,8 @@ The file is in `.gitignore`. Keys are never sent anywhere except to the provider
 
 ## Privacy
 
-The server binds to 127.0.0.1 only. Your text goes to the model provider you chose and nowhere else. The `materials/` folder is never sent. The `.gitignore` excludes `projects/` (except the sample), `snapshots/`, `config.json` and all generated data, so a public fork of this repository never carries a book by accident.
+The server binds to 127.0.0.1 only; nothing on your network can reach it. Your text goes to the model provider you chose and nowhere else. The `materials/` folder is never sent. The `.gitignore` excludes `projects/` (except the sample), `snapshots/`, `config.json` and all generated data, so a fork of this repository never carries a book by accident.
 
 ## License
 
-MIT. See `LICENSE`.
+MIT, © 2026 Wind Witch. See `LICENSE`.
