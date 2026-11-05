@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Writer</title>
+<link rel="stylesheet" href="/static/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+</head>
+<body>
+<header id="topbar">
+  <div class="left">
+    <span class="brand">✎</span>
+    <select id="projectSel" data-i18n-title="project"></select>
+    <button id="newProjectBtn" class="ghost" data-i18n-title="newProject">＋</button>
+    <span id="totalWords" class="muted" data-i18n-title="totalWords"></span>
+  </div>
+  <div class="right">
+    <select id="modelSel" data-i18n-title="model"></select>
+    <button id="snapshotBtn" class="ghost" data-i18n="snapshot" data-i18n-title="snapshotTip"></button>
+    <button id="checkBtn" class="ghost" data-i18n="check" data-i18n-title="checkTip"></button>
+    <button id="exportBtn" class="ghost" data-i18n="export" data-i18n-title="exportTip"></button>
+    <button id="memoryBtn" class="ghost" data-i18n="memory" data-i18n-title="memoryTip"></button>
+    <button id="notesBtn" class="ghost" data-i18n="notes" data-i18n-title="notesTip"></button>
+    <button id="promptsBtn" class="ghost" data-i18n="prompts" data-i18n-title="promptsTip"></button>
+    <button id="settingsBtn" class="ghost" data-i18n="settings" data-i18n-title="settingsTip"></button>
+  </div>
+</header>
+
+<main id="layout">
+  <aside id="sidebar">
+    <nav class="tabs">
+      <button data-tab="scenes" class="active" data-i18n="tabScenes"></button>
+      <button data-tab="codex" data-i18n="tabCodex"></button>
+      <button data-tab="chats" data-i18n="tabChats"></button>
+    </nav>
+    <section id="tab-scenes" class="tab active">
+      <div id="sceneTree"></div>
+      <div class="tabfoot">
+        <button id="newChapterBtn" class="ghost small" data-i18n="newChapter"></button>
+        <button id="importBtn" class="ghost small" data-i18n="importMd"></button>
+      </div>
+    </section>
+    <section id="tab-codex" class="tab">
+      <div id="codexList"></div>
+      <div class="tabfoot"><button id="newCodexBtn" class="ghost small" data-i18n="newEntry"></button></div>
+    </section>
+    <section id="tab-chats" class="tab">
+      <div id="chatList"></div>
+      <div class="tabfoot"><button id="newChatBtn" class="ghost small" data-i18n="newChat"></button></div>
+    </section>
+  </aside>
+  <div class="gutter" id="gutL" data-i18n-title="gutL"></div>
+
+  <section id="editor">
+    <div id="editorEmpty" class="empty" data-i18n="emptyEditor"></div>
+
+    <div id="sceneEditor" class="hidden">
+      <div class="edhead">
+        <input id="sceneTitle" class="title" data-i18n-ph="sceneTitle">
+        <select id="sceneStatus">
+          <option value="draft">Draft</option>
+          <option value="edited">Edited</option>
+          <option value="finalized">Finalized</option>
+        </select>
+        <span id="sceneWords" class="muted"></span>
+        <span id="saveState" class="muted"></span>
+        <button id="historyBtn" class="ghost small" data-i18n="history" data-i18n-title="historyTip"></button>
+        <button id="materialBtn" class="ghost small" data-i18n="materials" data-i18n-title="materialsTip"></button>
+        <button id="deleteSceneBtn" class="ghost small danger" data-i18n="delete" data-i18n-title="deleteTip"></button>
+      </div>
+      <details id="summaryBox">
+        <summary data-i18n="summary"></summary>
+        <textarea id="sceneSummary" rows="3" data-i18n-ph="summaryPh"></textarea>
+      </details>
+      <div class="ops">
+        <button data-op="critique" data-i18n="opCritique" data-i18n-title="opCritiqueTip"></button>
+        <button data-op="lineedit" data-i18n="opLineedit" data-i18n-title="opLineeditTip"></button>
+        <button data-op="style-check" data-i18n="opStyle" data-i18n-title="opStyleTip"></button>
+        <button data-op="summarize" data-i18n="opSummarize" data-i18n-title="opSummarizeTip"></button>
+        <span class="sep"></span>
+        <button data-op="rewrite" data-i18n="opRewrite" data-i18n-title="opRewriteTip"></button>
+        <button data-op="log-insert" data-i18n="opInsert" data-i18n-title="opInsertTip"></button>
+        <button data-op="screenplay-rewrite" data-i18n="opScreenplay" data-i18n-title="opScreenplayTip"></button>
+      </div>
+      <div id="writeSplit">
+        <textarea id="sceneBody" spellcheck="false" data-i18n-ph="bodyPh"></textarea>
+        <div class="gutter hidden" id="gutM" data-i18n-title="gutM"></div>
+        <div id="materialPane" class="hidden">
+          <div class="mathead">
+            <select id="materialSel" data-i18n-title="materialSel"></select>
+            <input id="materialFilter" data-i18n-ph="materialFilter">
+            <button id="materialClose" class="ghost small" data-i18n-title="materialClose">✕</button>
+          </div>
+          <div id="materialView"><div class="empty" data-i18n="materialPick"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="codexEditor" class="hidden">
+      <div class="edhead">
+        <input id="codexName" class="title" data-i18n-ph="codexName">
+        <span class="muted" id="codexCat"></span>
+        <label class="muted"><input type="checkbox" id="codexAlways"> <span data-i18n="always"></span></label>
+        <span id="codexSaveState" class="muted"></span>
+        <button id="deleteCodexBtn" class="ghost small danger" data-i18n="delete"></button>
+      </div>
+      <input id="codexAliases" data-i18n-ph="aliasesPh">
+      <textarea id="codexBody" spellcheck="false" data-i18n-ph="codexBodyPh"></textarea>
+    </div>
+  </section>
+  <div class="gutter" id="gutR" data-i18n-title="gutR"></div>
+
+  <aside id="chatPane">
+    <div class="chathead">
+      <input id="chatTitle" data-i18n-ph="chatTitle">
+      <button id="pinChatBtn" class="ghost small" data-i18n-title="pin">📌</button>
+      <button id="deleteChatBtn" class="ghost small danger" data-i18n-title="deleteChat">✕</button>
+    </div>
+    <details id="ctxBox" open>
+      <summary><span data-i18n="context"></span> <span id="ctxSummary" class="muted"></span></summary>
+      <div class="ctxrow">
+        <label><span data-i18n="ctxCodex"></span>
+          <select id="ctxCodex">
+            <option value="auto" data-i18n="ctxAuto"></option>
+            <option value="all" data-i18n="ctxAll"></option>
+            <option value="none" data-i18n="ctxNone"></option>
+          </select>
+        </label>
+      </div>
+      <div class="ctxrow">
+        <span data-i18n="ctxScenes"></span>
+        <button id="ctxCurrent" class="ghost small" data-i18n="ctxCurrent"></button>
+        <button id="ctxChapter" class="ghost small" data-i18n="ctxChapter" data-i18n-title="ctxChapterTip"></button>
+        <button id="ctxAll" class="ghost small" data-i18n="ctxBook" data-i18n-title="ctxBookTip"></button>
+        <button id="ctxClear" class="ghost small" data-i18n="ctxClear"></button>
+      </div>
+      <div id="ctxScenes" class="ctxscenes"></div>
+    </details>
+    <div id="messages"></div>
+    <div class="chatinput">
+      <textarea id="chatInput" rows="3" data-i18n-ph="chatPh"></textarea>
+      <div class="chatbtns">
+        <button id="extractBtn" class="ghost small" data-i18n="extract" data-i18n-title="extractTip"></button>
+        <span class="grow"></span>
+        <button id="stopBtn" class="ghost small hidden" data-i18n="stop"></button>
+        <button id="sendBtn" data-i18n="send"></button>
+      </div>
+    </div>
+  </aside>
+</main>
+
+<div id="modal" class="modal hidden">
+  <div class="modalbox">
+    <div class="modalhead"><span id="modalTitle"></span><button id="modalClose" class="ghost">✕</button></div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script src="/static/i18n.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>

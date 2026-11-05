@@ -1,0 +1,18 @@
+# keys
+app/config.json
+
+# your books: everything under projects/ except the bundled sample
+projects/*
+!projects/sample-novel/
+projects/sample-novel/chats/
+projects/sample-novel/.history/
+projects/sample-novel/.ingest/
+projects/sample-novel/.trash/
+
+# generated data
+snapshots/
+prompts/
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db

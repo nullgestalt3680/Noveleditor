@@ -1,0 +1,22 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>ingest</title></head>
+<body style="font-family:sans-serif;background:#1b1b1d;color:#ddd;padding:20px">
+<pre id="out">reading…</pre>
+<script>
+(async () => {
+  const out = document.getElementById("out");
+  try {
+    const raw = location.hash.slice(1);
+    if (!raw) { out.textContent = "no data in hash"; return; }
+    const data = JSON.parse(decodeURIComponent(raw));
+    const slug = data.slug;
+    delete data.slug;
+    const r = await fetch(`/api/project/${encodeURIComponent(slug)}/ingest`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
+    const j = await r.json();
+    out.textContent = "INGEST_OK " + JSON.stringify(j) + " bytes=" + raw.length;
+    history.replaceState(null, "", location.pathname);
+  } catch (e) { out.textContent = "INGEST_ERR " + e.message; }
+})();
+</script>
+</body></html>
